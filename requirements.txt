@@ -1,6 +1,6 @@
 Flask
 feedparser
 nltk
-logging
 gunicorn
-werkzeug
+werkzeug>=2.0.0
+python-dateutil
