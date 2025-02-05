@@ -2,5 +2,4 @@ Flask
 feedparser
 nltk
 logging
-html
 gunicorn
