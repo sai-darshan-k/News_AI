@@ -5,8 +5,13 @@ import nltk
 import logging
 from urllib.parse import urlparse
 import html
+import os
 
-nltk.download('vader_lexicon')
+#custom NLTK data path
+nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
+
+# Now download will work without errors
+nltk.download('vader_lexicon', download_dir=nltk.data.path[0])
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
