@@ -3,3 +3,4 @@ feedparser
 nltk
 logging
 gunicorn
+werkzeug
