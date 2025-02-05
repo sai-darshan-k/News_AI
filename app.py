@@ -7,49 +7,41 @@ from urllib.parse import urlparse
 import html
 import os
 
-#custom NLTK data path
-nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
-
-# Now download will work without errors
-nltk.download('vader_lexicon', download_dir=nltk.data.path[0])
+# Load Vader manually (No dynamic downloads)
+vader_path = os.path.join(os.path.dirname(__file__), "nltk_data/sentiment/vader_lexicon.txt")
+sia = SentimentIntensityAnalyzer(lexicon_file=vader_path)
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 logging.basicConfig(level=logging.DEBUG)
 
-# Updated RSS Feed URLs including The Hindu sources
+# RSS Feed Sources
 RSS_FEEDS = {
     "india": "https://feeds.feedburner.com/ndtvnews-india-news",
     "world": "https://feeds.feedburner.com/ndtvnews-world-news",
-    "education": {
-        "The Hindu Education": "https://www.thehindu.com/education/feeder/default.rss",
-    },
-    "agriculture": {
-        "The Hindu Agriculture": "https://www.thehindu.com/sci-tech/agriculture/feeder/default.rss"
-    },
+    "education": {"The Hindu Education": "https://www.thehindu.com/education/feeder/default.rss"},
+    "agriculture": {"The Hindu Agriculture": "https://www.thehindu.com/sci-tech/agriculture/feeder/default.rss"},
     "health": "https://www.thehindu.com/sci-tech/health/feeder/default.rss",
     "sports": "https://www.thehindu.com/sport/feeder/default.rss",
     "economy": "https://www.thehindu.com/business/Economy/feeder/default.rss"
 }
 
-sia = SentimentIntensityAnalyzer()
-
 def clean_html_content(text):
     """Remove HTML tags and decode HTML entities."""
-    text = html.unescape(text)  # Decode HTML entities
+    text = html.unescape(text)
     for tag in ['<p>', '</p>', '<br>', '<br/>', '<br />', '<div>', '</div>']:
         text = text.replace(tag, ' ')
     return text.strip()
 
 def analyze_sentiment(text):
-    """Perform sentiment analysis and return the sentiment label."""
+    """Perform sentiment analysis and return Positive, Negative, or Neutral."""
     score = sia.polarity_scores(text)['compound']
     if score >= 0.05:
-        return "Positive 😊"
+        return "Positive"
     elif score <= -0.05:
-        return "Negative 😞"
+        return "Negative"
     else:
-        return "Neutral 😐"
+        return "Neutral"
 
 def validate_feed_url(url):
     """Validate the feed URL structure."""
@@ -141,7 +133,6 @@ def home():
                       key=get_published_date, reverse=True)
 
     return render_template('index.html', articles=articles, category=category)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
